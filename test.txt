@@ -1,1 +1,60 @@
-hello world!!
+<Django에 대해...>
+* 시작하기 전에...
+- 가상환경 생성
+> python -m venv myvenv
+- 가상환경 사용
+C:\Users\Name\djangogirls> myvenv\Scripts\activate
+
+- 장고 설치
+(myvenv) ~$ pip install django~=2.2.9
+
+* 나의 첫 번째 Django 프로젝트! (간단한 블로그 사이트)
+(myvenv) C:\Users\Name\djangogirls> django-admin.py startproject mysite .
+혹은!!!  django-admin startproject mysite .
+- django-admin.py : 스크립트로 디렉토리와 파일들을 생성
+- manage.py : 스크립트(사이트 관리 도와줌, 다른 설치 없이 컴퓨터에서 웹 서버 시작)
+- settings.py : 웹사이트 설정이 있는 파일
+
+- 설정 변경(mysite/settings.py)
+TIME_ZONE = 'Asia/Seoul'
+
+- 정적 파일 경로 추가(mysite/settings.py)
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+- DEBUG = True 이고 ALLOWED_HOSTS = []
+호스트는 ['localhost', '127.0.0.1', '[::1]'] 에 대해서 유효
+애플리케이션 배포시 호스트 이름과 일치하지 않음..
+ALLOWED_HOSTS = ['127.0.0.1', '.pythonanywhere.com'] 로 변경!
+
+- 블로그에 데이터베이스 생성
+python manage.py migrate
+
+- 웹 서버 구동
+python manage.py runserver
+python manage.py runserver 0:8000    (UnicodeDecodeError 발생시)
+
+* 장고 모델(저장하면 데이터베이스에 저장)
+객체 : 속성과 행동을 모아놓은 것
+
+- 어플리케이션 만들기
+python manage.py startapp blog
+생성 후 장고에 사용해야 한다고 알려줘야 함(mysite/settings.py 를 통해)
+INSTALLED_APPS에 'blog' 추가
+
+- 블로그 글 모델 만들기(blog/models.py)
+models : Post가 장고 모델임을 의미(이걸 통해 장고는 Post가 데이터베이스에 저장되어야 한다고 알게 됨)
+models.CharField : 글자 수가 제한된 텍스트(글 제목 등)
+models.TextField : 글자 수에 제한이 없는 긴 텍스트(블로그 콘텐츠 등)
+models.DateTimeField : 날짜와 시간
+models.ForeignKey : 다른 모델에 대한 링크
+
+- 데이터베이스에 모델을 위한 테이블 만들기
+python manage.py makemigrations blog
+python manage.py migrate blog
+
+* 장고 관리자
+- 슈퍼사용자 생성(로그인 위해)
+python manage.py createsuperuser
+
+* 배포하기!
