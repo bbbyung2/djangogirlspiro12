@@ -58,3 +58,101 @@ python manage.py migrate blog
 python manage.py createsuperuser
 
 * 배포하기!
+git설치
+git repo 만들기
+github에 코드 배포
+
+- GitHub에서 PythonAnywhere로 코드 가져오기
+git clone https://github.com/bbbyung2/djangogirlspiro12
+tree djangogirlspiro12 : 디렉토리 분포?
+
+- PythonAnywhere에서 가상환경(virtualenv), 데이터베이스 생성하기
+$ cd djangogirlspiro12
+$ virtualenv --python=python3.6 myvenv
+$ source myvenv/bin/activate
+(myvenv) $  pip install django~=2.2.9
+(mvenv) $ python manage.py migrate
+(mvenv) $ python manage.py createsuperuser
+
+- web app으로 블로그 배포하기
+web 클릭 후 add a new web app
+수동설정(manual configuration) 선택 후 Python 3.6
+
+- 가상환경 설정(Virtualenv 섹션)
+/home/kobyunghwa/djangogirlspiro12/myvenv/
+
+- WSGI 파일 설정하기
+PythonAnywhere에게 웹 애플리케이션의 위치와 Django 설정 파일명을 알려주는 역할
+링크(페이지 상단에 있는 "코드(Code)" 섹션 내 /var/www/<your-username>_pythonanywhere_com_wsgi.py부분)를 클릭
+StaticFilesHandler는 CSS를 다루기 위한 것
+
+- 웹 사이트 탄생
+로컬에서 변경하고, 변경 사항을 GitHub에 적용하고, 변경 사항을 실제 웹 서버로 가져옴
+이를 통해 실제 웹 사이트를 손상시키지 않고 작업하고 테스트 해볼 수 있음음
+
+* 장고 URL
+- 나의 첫 번째 Django url!
+path('', include('blog.urls')) :  http://127.0.0.1:8000/ 로 들어오는 모든 접속 요청을 blog.urls로 전송해 추가 명령을 찾음
+
+- blog.urls
+path('', views.post_list, name='post_list') : post_list라는 view가 루트 URL에 할당
+누군가 웹사이트에 'http://127.0.0.1:8000/' 주소로 들어왔을 때 views.post_list를 보여주라고 말해줌
+no attribute 'post_list' 라는 메시지 보이면 장고가 찾고 사용하고자 하는 뷰가 없다는 뜻
+
+* 장고 뷰 만들기
+뷰 : 모델에서 필요한 정보를 받아와서 템플릿에 전달하는 역할
+def post_list(request):
+    return render(request, 'blog/post_list.html', {})
+request를 넘겨 render메서드를 호출, 그리고 받은 템플릿을 보여줌
+
+* HTML 시작하기
+pass
+
+* 장고 ORM과 쿼리셋
+쿼리셋 : 전달받은 모델의 객체 목록, DB로부터 데이터를 읽고 필터를 걸거나 정렬
+
+- 장고 쉘(종료는 exit())
+(myvenv) ~/djangogirls$ python manage.py shell
+>>> from blog.models import Post  (글을 먼저 불러옴)
+>>> Post.objects.all()
+
+- 객체 생성하기(게시물 쓰기)
+>>> from django.contrib.auth.models import User   (user를 먼저 불러옴)
+>>> User.objects.all()
+>>> me = User.objects.get(username='ola')
+>>> Post.objects.create(author=me, title='Sample title', text='Test')   (게시물 생성)
+
+- 필터링하기(특정 사용자가 작성한 글만)
+사용자명으로
+>>> Post.objects.filter(author=me)
+제목으로
+>>> Post.objects.filter(title__contains='title')
+게시일로
+>>> from django.utils import timezone
+>>> post = Post.objects.get(title="Sample title")
+>>> post.publish()
+>>> Post.objects.filter(published_date__lte=timezone.now())
+
+- 정렬하기
+>>> Post.objects.order_by('created_date')   오름차순
+>>> Post.objects.order_by('-created_date')   내림차순
+
+- 쿼리셋 연결하기(체이닝)
+>>> Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
+
+* 템플릿 동적 데이터
+from .models import Post   : models.py파일에 정의된 모델을 가져오기
+
+* 장고 템플릿
+템플릿 태그 : 파이썬을 HTML로 바꿔주어, 빠르고 쉽게 동적인 웹 사이트를 만들 수 있게 해줌
+- post 목록 템플릿 보여주기
+장고 템플릿 안에 있는 값을 출력하려면 변수 이름 안에 중괄호를 넣어 표시해야 함
+
+- |linebreaksbr : 블로그 글 텍스트에서 행이 바뀌면 문단으로 변환
+
+* CSS 예쁘게 만들기(꾸며주는 역할)
+- 부트스트랩 설치(<head> 내에)
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+
+- 정적 파일(모든 사용자들이 동일한 내용 봄)
